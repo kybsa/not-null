@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: not-null-dev
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    volumes:
+      - ../..:/workspaces:cached
+  sonar:
+    image: 'sonarqube:9.9.8-community'
+    container_name: not-null-sonar
+#    command: -Dsonar.ce.javaOpts=-Xmx356m -Dsonar.web.javaOpts=-Xmx356m
+    ports:
+      - '9001:9000'  

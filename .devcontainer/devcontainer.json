@@ -1,0 +1,23 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/java-postgres
+{
+	"name": "not-null",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"vscjava.vscode-java-pack",
+				"vscjava.vscode-java-test",
+				"redhat.vscode-xml",
+				"GitHub.copilot"
+			]
+			,"settings": {
+				    "java.compile.nullAnalysis.mode": "automatic"
+			}
+		}
+	}
+	
+}
