@@ -15,8 +15,14 @@ package com.kybsa;
  *  The Result.None class is also final and provides a singleton instance for empty results.
  *  The Result class is designed to be used in a functional programming style, allowing for
  *  pattern matching and functional transformations.
+ * @param <V> The type of the value contained in the Result.
+ * @param <E> The type of the error contained in the Result.
 */
 public sealed abstract class Result<V,E> permits Result.Some, Result.None, Result.Error {
+
+    private Result() {
+        // Private constructor to prevent instantiation from outside the class hierarchy.
+    }
 
     /**
      * Creates a Result instance based on the provided value and error.
@@ -26,6 +32,8 @@ public sealed abstract class Result<V,E> permits Result.Some, Result.None, Resul
      *
      * @param value The value to be wrapped in the Result.
      * @param error The error to be wrapped in the Result, if any.
+     * @param <V> The type of the value.
+     * @param <E> The type of the error.
      * @return A Result instance representing the provided value and error.
      */
     public static <V,E> Result<V,E> of(V value, E error) {
@@ -40,6 +48,8 @@ public sealed abstract class Result<V,E> permits Result.Some, Result.None, Resul
 
     /** 
      *  Creates a Result instance containing a value.
+     * @param <T> The type of the value.
+     * @param <E> Not used in this class, but kept for consistency with Result.
     */
     public static final class Some<T,E> extends Result<T,E> {
         private final T value;
@@ -64,6 +74,8 @@ public sealed abstract class Result<V,E> permits Result.Some, Result.None, Resul
      *  It is a final class, meaning it cannot be subclassed.
      *  The instance method provides a way to get the singleton instance of None.
      *  This class is useful for representing computations that do not yield a value.
+     * @param <T> Not used in this class, but kept for consistency with Result.
+     * @param <E> Not used in this class, but kept for consistency with Result.
      */
     public static final class None<T,E> extends Result<T,E> {
         private static final None<?,?> NONE = new None<>();        
@@ -82,6 +94,8 @@ public sealed abstract class Result<V,E> permits Result.Some, Result.None, Resul
      *  It is a final class, meaning it cannot be subclassed.
      *  The error is stored in a private final field and can be accessed via the getError method.
      *  This class is useful for representing computations that fail with an error.
+     * @param <T> Not used in this class, but kept for consistency with Result.
+     * @param <E> The type of the error contained in the Result.
      */
     public static final class Error<T,E> extends Result<T,E> {
         private final E error;
