@@ -1,5 +1,7 @@
 package com.kybsa;
 
+import java.util.function.Consumer;
+
 /**
  *  A generic Option type that can hold a value or be empty.
  *  This is a sealed class with two concrete implementations:
@@ -11,6 +13,9 @@ package com.kybsa;
  */
 public sealed abstract class Option<V> permits Option.Some, Option.None {
 
+    /**
+     * Private constructor for Option.
+     */
     private Option() {
         // Private constructor to prevent instantiation from outside the class hierarchy.
     }
@@ -30,6 +35,36 @@ public sealed abstract class Option<V> permits Option.Some, Option.None {
         return new Option.Some<V>(value);
     }
 
+    /**
+     * Checks if this Option contains a value.
+     * @return true if this Option contains a value (i.e., it is an instance of Some), false otherwise (i.e., it is an instance of None).
+     */
+    public abstract boolean isPresent() ;
+
+    /**
+     * Calls the provided consumer if this Option contains a value.
+     * If this Option is None, the consumer is not called.
+     * @param consumer The consumer to be called with the value if present.
+     */
+    public abstract void ifPresent(Consumer<? super V> consumer);
+
+    /**
+     * Checks if this Option is empty.
+     * An Option is considered empty if it is an instance of None.
+     * This method provides a way to determine if there is a value present in the Option.
+     * @return true if this Option is empty (i.e., it is an instance of None), false otherwise.
+     */
+    public abstract boolean isEmpty() ;
+    
+    /**
+     * Executes the provided action if this Option contains a value.
+     * If this Option is None, the emptyAction is executed instead.
+     * This method provides a way to handle both cases (value present and value absent) in a type-safe manner.
+     * @param consumerIfNotEmpty The action to be executed with the value if present.
+     * @param runnableIfEmpty The action to be executed if this Option is empty.
+     */
+    public abstract void ifPresentOrElse(Consumer<? super V> consumerIfNotEmpty, Runnable runnableIfEmpty);
+
     /** 
      * Creates an Option instance containing a value.
      * This method is a convenience method to create an Option.Some instance.
@@ -42,7 +77,7 @@ public sealed abstract class Option<V> permits Option.Some, Option.None {
          * This constructor initializes the Some instance with the provided value.
          * It is used to create an Option that contains a value.
          * It is a final class, meaning it cannot be subclassed.
-         * @param value
+         * @param value The value to be contained in this Option.s
          */
         private Some(T value) {
             this.value = value;
@@ -55,6 +90,50 @@ public sealed abstract class Option<V> permits Option.Some, Option.None {
          */
         public T get() {
             return value;
+        }
+
+        /**
+         * Since this Option is Some, it is always present.
+         * @return true, indicating that this Option contains a value.
+         */
+        @Override
+        public boolean isPresent() {
+            return true;
+        }
+
+        /**
+         * Calls the provided consumer with the value if this Option.
+         * @param consumer The consumer to be called with the value.
+         */
+        @Override
+        public void ifPresent(Consumer<? super T> consumer) {
+            if (consumer == null) {
+                throw new IllegalArgumentException("Consumer must not be null");
+            }
+            consumer.accept(value);
+        }
+
+        /**
+         * Checks if this Option is empty.
+         * Since this is Some, it is never empty.
+         * @return false, indicating that this Option contains a value.
+         */
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        /**
+         * Executes the provided consumerIfNotEmpty.
+         * @param consumerIfNotEmpty The action to be executed with the value present.
+         * @param runnableIfEmpty The action to be executed if this Option is empty since this is Some it will never call the runnable.
+         */
+        @Override
+        public void ifPresentOrElse(Consumer<? super T> consumerIfNotEmpty, Runnable runnableIfEmpty) {
+            if(consumerIfNotEmpty == null) {
+                throw new IllegalArgumentException("Consumer must not be null");
+            }
+            consumerIfNotEmpty.accept(value);   
         }
     }    
 
@@ -88,6 +167,49 @@ public sealed abstract class Option<V> permits Option.Some, Option.None {
         @SuppressWarnings("unchecked")
         private static <T> None<T> instance() {
             return (None<T>)NONE;
+        }
+
+        /**
+         * Since this Option is None, it is never present.
+         * @return false, indicating that this Option does not contain a value.
+         */
+        @Override
+        public boolean isPresent() {
+            return false;
+        }
+
+        /**
+         * Calls the provided consumer with the value if this Option.
+         * Since this is None, the consumer is not called.
+         * @param consumer The consumer to be called with the value, if present.
+         */
+        @Override
+        public void ifPresent(Consumer<? super T> consumer) {
+            // Do nothing, as there is no value to consume.
+        }
+
+        /**
+         * Checks if this Option is empty.
+         * Since this is None, it is always empty.
+         * @return true, indicating that this Option does not contain a value.
+         */
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        /**
+         * Executes the provided runnableIfEmpty.
+         * Since this is None, the runnable is executed.
+         * @param consumerIfNotEmpty The action to be executed with the value present, not called in this case.
+         * @param runnableIfEmpty The action to be executed.
+         */
+        @Override
+        public void ifPresentOrElse(Consumer<? super T> consumerIfNotEmpty, Runnable runnableIfEmpty) {
+            if(runnableIfEmpty == null) {
+                throw new IllegalArgumentException("runnable must not be null");
+            }
+            runnableIfEmpty.run(); // Execute the empty action since this is None   
         }
     }
 } 

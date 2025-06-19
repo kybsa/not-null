@@ -55,6 +55,42 @@ switch (result) {
 - Handle errors without exceptions.
 - Write more readable and maintainable code.
 
+
+## Requirements
+
+- **Java 21** or higher is required to build and use this project.
+
+Make sure you have a compatible JDK installed. You can check your Java version with:
+
+```sh
+java -version
+```
+
+## How to include this library
+
+### Maven
+
+Add the following dependency to your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>com.kybsa</groupId>
+    <artifactId>not-null</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+### Gradle
+
+Add the following to your `build.gradle` dependencies:
+
+```groovy
+dependencies {
+    implementation 'com.kybsa:not-null:1.0.0'
+}
+```
+ Replace `1.0.0` with the actual version you want to use.
+
 ## License
 
 MIT License.
