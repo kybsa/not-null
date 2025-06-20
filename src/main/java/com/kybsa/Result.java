@@ -1,5 +1,8 @@
 package com.kybsa;
 
+import java.util.function.Consumer;
+
+
 /**
  *  A Result type that can hold a value, an error, or be empty.
  *  This is a sealed class with three concrete implementations:
@@ -18,11 +21,9 @@ package com.kybsa;
  * @param <V> The type of the value contained in the Result.
  * @param <E> The type of the error contained in the Result.
 */
-public sealed abstract class Result<V,E> permits Result.Some, Result.None, Result.Error {
+public sealed interface Result<V,E> permits Result.Some, Result.None, Result.Error {
 
-    private Result() {
-        // Private constructor to prevent instantiation from outside the class hierarchy.
-    }
+    static final None<?,?> NONE = new None<>();      
 
     /**
      * Creates a Result instance based on the provided value and error.
@@ -36,23 +37,58 @@ public sealed abstract class Result<V,E> permits Result.Some, Result.None, Resul
      * @param <E> The type of the error.
      * @return A Result instance representing the provided value and error.
      */
+    @SuppressWarnings("unchecked")
     public static <V,E> Result<V,E> of(V value, E error) {
         if(error != null) {
-            return new Error<V,E>(error);
+            return new Error<>(error);
         }
         if (value == null) {
-            return None.instance();
+            return (None<V,E>)NONE;
         }
-        return new Result.Some<V,E>(value);
+        return new Result.Some<>(value);
     }
+    
+    /**
+     * Checks if this Result contains a value.
+     * @return  true if this Result contains a value (i.e., it is an instance of Some),
+     *          false otherwise (i.e., it is an instance of None or Error).
+     */
+    boolean isPresent();
+
+    /**
+     * Checks if this Result is empty.
+     * A Result is considered empty if it is an instance of None.
+     * This method provides a way to determine if there is a value present in the Result.
+     * @return true if this Result is empty (i.e., it is an instance of None),
+     */
+    boolean isEmpty();
+
+    /**
+     * Calls the provided consumer if this Result contains a value.
+     * If this Result is None or Error, the consumer is not called.
+     * This method is used to perform an action with the value if it is present.
+     * @param consumer The consumer to be called with the value if present.
+     */
+    void ifPresent(Consumer<? super V> consumer);
+
+    /**
+     * Calls the provided consumer if this Result contains an error.
+     * @param consumer The consumer to be called with the error if present.
+     */
+    void ifError(Consumer<? super E> consumer);
 
     /** 
      *  Creates a Result instance containing a value.
      * @param <T> The type of the value.
      * @param <E> Not used in this class, but kept for consistency with Result.
     */
-    public static final class Some<T,E> extends Result<T,E> {
+    public static final class Some<T,E> implements Result<T,E> {
         private final T value;
+
+        /**
+         * Constructor for Some.
+         * @param value The value to be contained in this Result.
+         */
         private Some(T value) {
             this.value = value;
         }
@@ -64,6 +100,49 @@ public sealed abstract class Result<V,E> permits Result.Some, Result.None, Resul
          */
         public T get() {
             return value;
+        }
+
+        /**
+         * Since this Result contains a value, this method always returns true.
+         * @return true, indicating that this Result contains a value.
+         */
+        @Override
+        public boolean isPresent() {
+            return true;
+        }
+
+        /**
+         * Checks if this Result is empty.
+         * Since this Result is Some, it is never empty.
+         * @return false, indicating that this Result is not empty.
+         */
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        /**
+         * Calls the provided consumer with the value contained in this Result.
+         * This method is used to perform an action with the value if it is present.
+         * @param consumer The consumer to be called with the value.
+         * @throws IllegalArgumentException if the consumer is null.
+         */
+        @Override
+        public void ifPresent(Consumer<? super T> consumer) {
+            if (consumer == null) {
+                throw new IllegalArgumentException("Consumer must not be null");
+            }
+            consumer.accept(value);
+        }
+
+        /**
+         * This method does nothing since this Result is Some and does not contain an error.
+         * @param consumer The consumer to be called with the error, which will never be called.
+         */
+        public  void ifError(Consumer<? super E> consumer){
+            // No action is taken since this Result is Some and does not contain an error.
+            // This method is provided to allow for a consistent interface with Result.Error.
+            // It is a no-op in this case.
         }
     }    
 
@@ -77,14 +156,52 @@ public sealed abstract class Result<V,E> permits Result.Some, Result.None, Resul
      * @param <T> Not used in this class, but kept for consistency with Result.
      * @param <E> Not used in this class, but kept for consistency with Result.
      */
-    public static final class None<T,E> extends Result<T,E> {
-        private static final None<?,?> NONE = new None<>();        
+    public static final class None<T,E> implements Result<T,E> {    
+        
+        /**
+         * Constructor for None.
+         * This constructor is private to enforce the singleton pattern.
+         */
         private None() {
         }
 
-        @SuppressWarnings("unchecked")
-        private static <T,E> None<T,E> instance() {
-            return (None<T,E>)NONE;
+        /**
+         * Since this Result is None, it is always return false.
+         * @return false, indicating that this Result does not contain a value.
+         */
+        @Override
+        public boolean isPresent() {
+            return false;
+        }
+
+        /**
+         * Checks if this Result is empty.
+         * Since this Result is None, it is always empty.
+         * @return true, indicating that this Result is empty.
+         */
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        /**
+         * This method does nothing since this Result is None.
+         * It is provided to allow for a consistent interface with Result.Some.
+         * @param consumer The consumer to be called with the value, which will never be called.
+         */
+        @Override
+        public void ifPresent(Consumer<? super T> consumer) {          
+            // No action is taken since this Result is None. 
+        }
+
+        /**
+         * This method does nothing since this Result is None and does not contain an error.
+         * @param consumer The consumer to be called with the error, which will never be called
+         */
+        public  void ifError(Consumer<? super E> consumer){
+            // No action is taken since this Result is Some and does not contain an error.
+            // This method is provided to allow for a consistent interface with Result.Error.
+            // It is a no-op in this case.
         }
     }
 
@@ -97,10 +214,15 @@ public sealed abstract class Result<V,E> permits Result.Some, Result.None, Resul
      * @param <T> Not used in this class, but kept for consistency with Result.
      * @param <E> The type of the error contained in the Result.
      */
-    public static final class Error<T,E> extends Result<T,E> {
-        private final E error;
-        Error(E error) {
-            this.error = error;
+    public static final class Error<T,E> implements Result<T,E> {
+        private final E cause;
+        /**
+         * Constructor for Error.
+         * This constructor initializes the error contained in this Result.
+         * @param cause The error to be contained in this Result.
+         */
+        Error(E cause) {
+            this.cause = cause;
         }
 
         /**
@@ -109,8 +231,50 @@ public sealed abstract class Result<V,E> permits Result.Some, Result.None, Resul
          *  It is useful for handling errors in a type-safe manner without resorting to exceptions.
          *  @return The error contained in this Result.
          */
-        public E getError() {
-            return error;
+        public E getCause() {
+            return cause;
+        }
+
+        /**
+         * Since this Result contains an error, it is never present.
+         * @return false, indicating that this Result does not contain a value.
+         */
+        @Override
+        public boolean isPresent() {
+            return false;
+        }
+
+        /**
+         * This method does nothing since this Result is an Error.
+         * It is provided to allow for a consistent interface with Result.Some.
+         * @param consumer The consumer to be called with the value, which will never be called.
+         */
+        @Override
+        public void ifPresent(Consumer<? super T> consumer) {  
+            // No action is taken since this Result is an Error.        
+        }
+
+        /**
+         * Checks if this Result is empty.
+         * Since this Result is an Error, it is never empty.
+         * @return false, indicating that this Result is not empty.
+         */
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        /**
+         * Calls the provided consumer with the error contained in this Result.
+         * This method is used to handle errors in a type-safe manner without resorting to exceptions.
+         * @param consumer The consumer to be called with the error.
+         * @throws IllegalArgumentException if the consumer is null.
+         */
+        public void ifError(Consumer<? super E> consumer){
+            if (consumer == null) {
+                throw new IllegalArgumentException("Consumer must not be null");
+            }
+            consumer.accept(cause);
         }
     }
 } 

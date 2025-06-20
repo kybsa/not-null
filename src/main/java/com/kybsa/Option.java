@@ -11,14 +11,7 @@ import java.util.function.Consumer;
  *  It provides a way to handle the presence or absence of a value in a type-safe manner.
  * @param <V> The type of the value contained in the Option.
  */
-public sealed abstract class Option<V> permits Option.Some, Option.None {
-
-    /**
-     * Private constructor for Option.
-     */
-    private Option() {
-        // Private constructor to prevent instantiation from outside the class hierarchy.
-    }
+public sealed interface Option<V> permits Option.Some, Option.None {
 
     /**
      *  Creates an Option instance based on the provided value.
@@ -28,25 +21,25 @@ public sealed abstract class Option<V> permits Option.Some, Option.None {
      * @param value The value to be wrapped in the Option.
      * @return An Option instance representing the provided value.
      */
-    public static <V> Option<V> of(V value) {       
+    static <V> Option<V> of(V value) {       
         if (value == null) {
             return None.instance();
         }
-        return new Option.Some<V>(value);
+        return new Option.Some<>(value);
     }
 
     /**
      * Checks if this Option contains a value.
      * @return true if this Option contains a value (i.e., it is an instance of Some), false otherwise (i.e., it is an instance of None).
      */
-    public abstract boolean isPresent() ;
+    boolean isPresent() ;
 
     /**
      * Calls the provided consumer if this Option contains a value.
      * If this Option is None, the consumer is not called.
      * @param consumer The consumer to be called with the value if present.
      */
-    public abstract void ifPresent(Consumer<? super V> consumer);
+    void ifPresent(Consumer<? super V> consumer);
 
     /**
      * Checks if this Option is empty.
@@ -54,7 +47,7 @@ public sealed abstract class Option<V> permits Option.Some, Option.None {
      * This method provides a way to determine if there is a value present in the Option.
      * @return true if this Option is empty (i.e., it is an instance of None), false otherwise.
      */
-    public abstract boolean isEmpty() ;
+    boolean isEmpty() ;
     
     /**
      * Executes the provided action if this Option contains a value.
@@ -63,14 +56,14 @@ public sealed abstract class Option<V> permits Option.Some, Option.None {
      * @param consumerIfNotEmpty The action to be executed with the value if present.
      * @param runnableIfEmpty The action to be executed if this Option is empty.
      */
-    public abstract void ifPresentOrElse(Consumer<? super V> consumerIfNotEmpty, Runnable runnableIfEmpty);
+    void ifPresentOrElse(Consumer<? super V> consumerIfNotEmpty, Runnable runnableIfEmpty);
 
     /** 
      * Creates an Option instance containing a value.
      * This method is a convenience method to create an Option.Some instance.
      * @param <T> The type of the value.
     */
-    public static final class Some<T> extends Option<T> {
+    public static final class Some<T> implements Option<T> {
         private final T value;
         /**
          * Constructor for Some.
@@ -147,8 +140,8 @@ public sealed abstract class Option<V> permits Option.Some, Option.None {
      *  It provides a type-safe way to represent the absence of a value without using null.
      *  @param <T> Not used in this class, but kept for consistency with Option.
      */
-    public static final class None<T> extends Option<T> {
-        private static final None<?> NONE = new None<>();   
+    public static final class None<T> implements Option<T> {
+        private static final None<?> INSTANCE = new None<>();   
         /**
          * Private constructor for None.
          * This constructor is private to enforce the singleton pattern.
@@ -166,7 +159,7 @@ public sealed abstract class Option<V> permits Option.Some, Option.None {
          */
         @SuppressWarnings("unchecked")
         private static <T> None<T> instance() {
-            return (None<T>)NONE;
+            return (None<T>)INSTANCE;
         }
 
         /**
