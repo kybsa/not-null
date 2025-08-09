@@ -8,23 +8,23 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class OptionTest {
+class OptionalTest {
     @Test
     void givenValue_WhenOf_ThenReturnSome() {
-        Option<String> okOption = Option.of("Success");
-        assertInstanceOf(Option.Some.class, okOption);
-        assertEquals("Success", ((Option.Some<String>) okOption).get());
+        Optional<String> okOption = Optional.of("Success");
+        assertInstanceOf(Optional.Some.class, okOption);
+        assertEquals("Success", ((Optional.Some<String>) okOption).get());
     }
 
     @Test
     void givenNullValue_WhenOf_ThenReturnNone() {
-        Option<String> okOption = Option.of(null);
-        assertTrue(okOption instanceof Option.None);
+        Optional<String> okOption = Optional.of(null);
+        assertTrue(okOption instanceof Optional.None);
     }
 
     @Test
     void givenSome_WhenIfPresent_ThenConsumerCalled() {
-        Option<String> someOption = Option.of("Hello");
+        Optional<String> someOption = Optional.of("Hello");
         StringBuilder result = new StringBuilder();
         someOption.ifPresent(value -> result.append(value));
         assertEquals("Hello", result.toString());
@@ -32,7 +32,7 @@ class OptionTest {
 
     @Test
     void givenNone_WhenIfPresent_ThenConsumerNotCalled() {
-        Option<String> noneOption = Option.of(null);
+        Optional<String> noneOption = Optional.of(null);
         StringBuilder result = new StringBuilder();
         noneOption.ifPresent(value -> result.append(value));
         assertEquals("", result.toString());
@@ -40,7 +40,7 @@ class OptionTest {
 
     @Test
     void givenSome_WhenIfPresentOrElse_ThenConsumerCalled() {
-        Option<String> someOption = Option.of("Hello");
+        Optional<String> someOption = Optional.of("Hello");
         StringBuilder result = new StringBuilder();
         someOption.ifPresentOrElse(
                 value -> result.append(value),
@@ -50,7 +50,7 @@ class OptionTest {
 
     @Test
     void givenNone_WhenIfPresentOrElse_ThenRunnableCalled() {
-        Option<String> noneOption = Option.of(null);
+        Optional<String> noneOption = Optional.of(null);
         StringBuilder result = new StringBuilder();
         noneOption.ifPresentOrElse(
                 value -> result.append(value),
@@ -60,7 +60,7 @@ class OptionTest {
 
     @Test
     void giveNullConsumer_WhenIfPresent_ThenConsumerThrowIllegalArgumentException() {
-        Option<String> noneOption = Option.of("value");
+        Optional<String> noneOption = Optional.of("value");
         assertThrows(IllegalArgumentException.class, () -> {
             noneOption.ifPresent(null);
         }, "ifPresent must not be throw IllegalArgumentException when consumer is null");
@@ -68,7 +68,7 @@ class OptionTest {
 
     @Test
     void giveSomeAndNullConsumer_WhenIfPresentOrElse_ThenConsumerThrowIllegalArgumentException() {
-        Option<String> noneOption = Option.of("value");
+        Optional<String> noneOption = Optional.of("value");
         assertThrows(IllegalArgumentException.class, () -> {
             noneOption.ifPresentOrElse(null, () -> {
             });
@@ -77,7 +77,7 @@ class OptionTest {
 
     @Test
     void giveNoneAndNullConsumer_WhenIfPresentOrElse_ThenConsumerThrowIllegalArgumentException() {
-        Option<String> noneOption = Option.of(null);
+        Optional<String> noneOption = Optional.of(null);
         assertThrows(IllegalArgumentException.class, () -> {
             noneOption.ifPresentOrElse(value -> {
             }, null);
@@ -86,25 +86,25 @@ class OptionTest {
 
     @Test
     void givenSome_WhenIsPresent_ThenReturnTrue() {
-        Option<String> someOption = Option.of("Hello");
+        Optional<String> someOption = Optional.of("Hello");
         assertTrue(someOption.isPresent(), "isPresent must return true for Some");
     }
 
     @Test
     void givenSome_WhenIsPresent_ThenReturnFalse() {
-        Option<String> someOption = Option.of(null);
+        Optional<String> someOption = Optional.of(null);
         assertFalse(someOption.isPresent(), "isPresent must return false for None");
     }
 
     @Test
     void givenSome_WhenIsEmpty_ThenReturnFalse() {
-        Option<String> someOption = Option.of("Hello");
+        Optional<String> someOption = Optional.of("Hello");
         assertFalse(someOption.isEmpty(), "isEmpty must return false for Some");
     }
 
     @Test
     void givenNone_WhenIsEmpty_ThenReturnTrue() {
-        Option<String> noneOption = Option.of(null);
+        Optional<String> noneOption = Optional.of(null);
         assertTrue(noneOption.isEmpty(), "isEmpty must return true for None");
     }
 }

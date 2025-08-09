@@ -3,91 +3,91 @@ package com.kybsa;
 import java.util.function.Consumer;
 
 /**
- *  A generic Option type that can hold a value or be empty.
+ *  A generic Optional type that can hold a value or be empty.
  *  This is a sealed class with two concrete implementations:
- *  - Option.Some: Holds a value.
- *  - Option.None: Represents an empty option.
+ *  - Optional.Some: Holds a value.
+ *  - Optional.None: Represents an empty Optional.
  *  This class is useful for representing optional values without resorting to null checks.
  *  It provides a way to handle the presence or absence of a value in a type-safe manner.
- * @param <V> The type of the value contained in the Option.
+ * @param <V> The type of the value contained in the Optional.
  */
-public sealed interface Option<V> permits Option.Some, Option.None {
+public sealed interface Optional<V> permits Optional.Some, Optional.None {
 
     /**
-     *  Creates an Option instance based on the provided value.
+     *  Creates an Optional instance based on the provided value.
      *  If the value is null, it returns an instance of None.
      *  Otherwise, it returns an instance of Some containing the value.
      * @param <V> The type of the value.
-     * @param value The value to be wrapped in the Option.
-     * @return An Option instance representing the provided value.
+     * @param value The value to be wrapped in the Optional.
+     * @return An Optional instance representing the provided value.
      */
-    static <V> Option<V> of(V value) {       
+    static <V> Optional<V> of(V value) {       
         if (value == null) {
             return None.instance();
         }
-        return new Option.Some<>(value);
+        return new Optional.Some<>(value);
     }
 
     /**
-     * Checks if this Option contains a value.
-     * @return true if this Option contains a value (i.e., it is an instance of Some), false otherwise (i.e., it is an instance of None).
+     * Checks if this Optional contains a value.
+     * @return true if this Optional contains a value (i.e., it is an instance of Some), false otherwise (i.e., it is an instance of None).
      */
     boolean isPresent() ;
 
     /**
-     * Calls the provided consumer if this Option contains a value.
-     * If this Option is None, the consumer is not called.
+     * Calls the provided consumer if this Optional contains a value.
+     * If this Optional is None, the consumer is not called.
      * @param consumer The consumer to be called with the value if present.
      */
     void ifPresent(Consumer<? super V> consumer);
 
     /**
-     * Checks if this Option is empty.
-     * An Option is considered empty if it is an instance of None.
-     * This method provides a way to determine if there is a value present in the Option.
-     * @return true if this Option is empty (i.e., it is an instance of None), false otherwise.
+     * Checks if this Optional is empty.
+     * An Optional is considered empty if it is an instance of None.
+     * This method provides a way to determine if there is a value present in the Optional.
+     * @return true if this Optional is empty (i.e., it is an instance of None), false otherwise.
      */
     boolean isEmpty() ;
     
     /**
-     * Executes the provided action if this Option contains a value.
-     * If this Option is None, the emptyAction is executed instead.
+     * Executes the provided action if this Optional contains a value.
+     * If this Optional is None, the emptyAction is executed instead.
      * This method provides a way to handle both cases (value present and value absent) in a type-safe manner.
      * @param consumerIfNotEmpty The action to be executed with the value if present.
-     * @param runnableIfEmpty The action to be executed if this Option is empty.
+     * @param runnableIfEmpty The action to be executed if this Optional is empty.
      */
     void ifPresentOrElse(Consumer<? super V> consumerIfNotEmpty, Runnable runnableIfEmpty);
 
     /** 
-     * Creates an Option instance containing a value.
-     * This method is a convenience method to create an Option.Some instance.
+     * Creates an Optional instance containing a value.
+     * This method is a convenience method to create an Optional.Some instance.
      * @param <T> The type of the value.
     */
-    public static final class Some<T> implements Option<T> {
+    public static final class Some<T> implements Optional<T> {
         private final T value;
         /**
          * Constructor for Some.
          * This constructor initializes the Some instance with the provided value.
-         * It is used to create an Option that contains a value.
+         * It is used to create an Optional that contains a value.
          * It is a final class, meaning it cannot be subclassed.
-         * @param value The value to be contained in this Option.s
+         * @param value The value to be contained in this Optional.
          */
         private Some(T value) {
             this.value = value;
         }
         /**
-         * Gets the value contained in this Option.
+         * Gets the value contained in this Optional.
          * This method provides access to the value that was successfully computed.
          * It is useful for handling successful computations in a type-safe manner.
-         * @return The value contained in this Option.
+         * @return The value contained in this Optional.
          */
         public T get() {
             return value;
         }
 
         /**
-         * Since this Option is Some, it is always present.
-         * @return true, indicating that this Option contains a value.
+         * Since this Optional is Some, it is always present.
+         * @return true, indicating that this Optional contains a value.
          */
         @Override
         public boolean isPresent() {
@@ -95,7 +95,7 @@ public sealed interface Option<V> permits Option.Some, Option.None {
         }
 
         /**
-         * Calls the provided consumer with the value if this Option.
+         * Calls the provided consumer with the value if this Optional.
          * @param consumer The consumer to be called with the value.
          */
         @Override
@@ -107,9 +107,9 @@ public sealed interface Option<V> permits Option.Some, Option.None {
         }
 
         /**
-         * Checks if this Option is empty.
+         * Checks if this Optional is empty.
          * Since this is Some, it is never empty.
-         * @return false, indicating that this Option contains a value.
+         * @return false, indicating that this Optional contains a value.
          */
         @Override
         public boolean isEmpty() {
@@ -119,7 +119,7 @@ public sealed interface Option<V> permits Option.Some, Option.None {
         /**
          * Executes the provided consumerIfNotEmpty.
          * @param consumerIfNotEmpty The action to be executed with the value present.
-         * @param runnableIfEmpty The action to be executed if this Option is empty since this is Some it will never call the runnable.
+         * @param runnableIfEmpty The action to be executed if this Optional is empty since this is Some it will never call the runnable.
          */
         @Override
         public void ifPresentOrElse(Consumer<? super T> consumerIfNotEmpty, Runnable runnableIfEmpty) {
@@ -131,16 +131,16 @@ public sealed interface Option<V> permits Option.Some, Option.None {
     }    
 
     /**
-     *  Represents an empty Option.
+     *  Represents an empty Optional.
      *  This class is a singleton, meaning there is only one instance of None.
-     *  It is used to represent the absence of a value in an Option.
+     *  It is used to represent the absence of a value in an Optional.
      *  It is a final class, meaning it cannot be subclassed.
      *  The instance method provides a way to get the singleton instance of None.
      *  This class is useful for representing computations that do not yield a value.
      *  It provides a type-safe way to represent the absence of a value without using null.
-     *  @param <T> Not used in this class, but kept for consistency with Option.
+     *  @param <T> Not used in this class, but kept for consistency with Optional.
      */
-    public static final class None<T> implements Option<T> {
+    public static final class None<T> implements Optional<T> {
         private static final None<?> INSTANCE = new None<>();   
         /**
          * Private constructor for None.
@@ -154,7 +154,7 @@ public sealed interface Option<V> permits Option.Some, Option.None {
          * Provides a singleton instance of None.
          * This method returns the single instance of None, ensuring that there is only one instance of this class.
          * It is a static method that can be called without creating an instance of None.
-         * @param <T> The type of the value, not used in this class but kept for consistency with Option.
+         * @param <T> The type of the value, not used in this class but kept for consistency with Optional.
          * @return The singleton instance of None.
          */
         @SuppressWarnings("unchecked")
@@ -163,8 +163,8 @@ public sealed interface Option<V> permits Option.Some, Option.None {
         }
 
         /**
-         * Since this Option is None, it is never present.
-         * @return false, indicating that this Option does not contain a value.
+         * Since this Optional is None, it is never present.
+         * @return false, indicating that this Optional does not contain a value.
          */
         @Override
         public boolean isPresent() {
@@ -172,7 +172,7 @@ public sealed interface Option<V> permits Option.Some, Option.None {
         }
 
         /**
-         * Calls the provided consumer with the value if this Option.
+         * Calls the provided consumer with the value if this Optional.
          * Since this is None, the consumer is not called.
          * @param consumer The consumer to be called with the value, if present.
          */
@@ -182,9 +182,9 @@ public sealed interface Option<V> permits Option.Some, Option.None {
         }
 
         /**
-         * Checks if this Option is empty.
+         * Checks if this Optional is empty.
          * Since this is None, it is always empty.
-         * @return true, indicating that this Option does not contain a value.
+         * @return true, indicating that this Optional does not contain a value.
          */
         @Override
         public boolean isEmpty() {

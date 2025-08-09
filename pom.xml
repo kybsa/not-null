@@ -6,7 +6,7 @@
 
     <groupId>com.kybsa</groupId>
     <artifactId>not-null</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <name>not-null</name>
     <description>not-null</description>
     <url>https://github.com/kybsa/not-null</url>

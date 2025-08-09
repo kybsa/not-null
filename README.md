@@ -1,27 +1,27 @@
 # Not-Null Java Utilities
 
-This project provides two utility types for Java: `Option` and `Result`. These types are inspired by Rust programming language, this project is designed to help you write safer, more expressive code by avoiding `null` checks and unchecked exceptions.
+This project provides two utility types for Java: `Optional` and `Result`. These types are inspired by Rust programming language, this project is designed to help you write safer, more expressive code by avoiding `null` checks and unchecked exceptions.
 
 ## Features
 
-- **Option**: Represents an optional value that may or may not be present.
+- **Optional**: Represents an optional value that may or may not be present.
 - **Result**: Represents the result of an operation that can succeed with a value, fail with an error, or be empty.
 
 ## Classes
 
-### Option
+### Optional
 
-Located at: `com.kybsa.Option`
+Located at: `com.kybsa.Optional`
 
-The `Option<V>` class is a sealed type with two implementations:
+The `Optional<V>` class is a sealed type with two implementations:
 
-- `Option.Some<V>`: Contains a value.
-- `Option.None<V>`: Represents the absence of a value.
+- `Optional.Some<V>`: Contains a value.
+- `Optional.None<V>`: Represents the absence of a value.
 
 #### Example
 
 ```java
-Option<String> maybeString = Option.of("Hello, World!");
+Optional<String> maybeString = Optional.of("Hello, World!");
 switch (maybeString) {
     case Some<String> s -> System.out.println("Found a value: " + s.get());
     case None<String> n -> System.out.println("No value found.");
@@ -76,7 +76,7 @@ Add the following dependency to your `pom.xml`:
 <dependency>
     <groupId>com.kybsa</groupId>
     <artifactId>not-null</artifactId>
-    <version>1.0.0</version>
+    <version>0.0.3</version>
 </dependency>
 ```
 
