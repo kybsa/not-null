@@ -86,10 +86,10 @@ Add the following to your `build.gradle` dependencies:
 
 ```groovy
 dependencies {
-    implementation 'com.kybsa:not-null:1.0.0'
+    implementation 'com.kybsa:not-null:0.0.3'
 }
 ```
- Replace `1.0.0` with the actual version you want to use.
+ Replace `0.0.3` with the actual version you want to use.
 
 ## License
 
